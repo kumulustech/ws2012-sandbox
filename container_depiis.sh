@@ -19,4 +19,4 @@ aws ec2 run-instances \
     --instance-type t2.micro \
     --key-name ws2012-sandbox \
     --security-groups ws2012-sandbox \
-    --user-data ${ envsubts < user-data.txt }
+    --user-data ${ envsubst < user-data.txt }

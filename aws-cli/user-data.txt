@@ -1,6 +1,7 @@
 <script>
-aws s3 cp ${S3_BUCKET_URI} C:/s3-files/
+aws s3 cp ${S3_BUCKET_URI} C:\s3-files\
 </script>
 <powershell>
-.\C:/s3-files/deploy-sandbox.ps1
+. .\C:\s3-files\test-website-config.ps1
+TestWebsiteConfig
 </powershell>
