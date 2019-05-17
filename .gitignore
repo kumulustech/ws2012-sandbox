@@ -1,1 +1,3 @@
 .vscode/settings.json
+aws_config.env
+ws2012-sandbox-key.pem

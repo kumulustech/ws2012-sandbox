@@ -1,7 +1,6 @@
-<script>
-aws s3 cp ${S3_BUCKET_URI} C:\s3-files\
-</script>
 <powershell>
-. .\C:\s3-files\test-website-config.ps1
-TestWebsiteConfig
+Import-Module AWSPowerShell
+Set-AWSCredential -AccessKey ${AWS_ACCESS_KEY_ID} -SecretKey ${AWS_SECRET_ACCESS_KEY} -StoreAs default
+Copy-S3Object -BucketName ${S3_BUCKET_NAME} -Key ${S3_BUCKET_KEY} -LocalFile C:\s3-files\
+Invoke-Expression -Command "C:\s3-files\test-website-config.ps1"
 </powershell>

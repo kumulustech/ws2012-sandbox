@@ -1,23 +1,18 @@
-# https://docs.microsoft.com/en-us/powershell/dsc/quickstarts/website-quickstart
-Configuration TestWebsiteConfig {
+# https://weblog.west-wind.com/posts/2017/may/25/automating-iis-feature-installation-with-powershell
+# https://documentation.observeit.com/installation_guide/installing_iis_8.x_on_windows_server_2012_r2.htm
+Import-Module ServerManager
 
-    # Import the module that contains the resources we're using.
-    Import-DscResource -ModuleName PsDesiredStateConfiguration
+Install-WindowsFeature Web-Server, Web-WebServer, Web-Common-Http, Web-Default-Doc, Web-Dir-Browsing, Web-Http-Errors, Web-Static-Content, Web-Health, Web-Http-Logging, Web-Performance, Web-Stat-Compression, Web-Security, Web-Filtering, Web-App-Dev, Web-Net-Ext, Web-Net-Ext45, Web-Asp, Web-Asp-Net, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Mgmt-Tools, Web-Mgmt-Console, Web-Mgmt-Compat, Web-Metabase, Web-Lgcy-Mgmt-Console, Web-Lgcy-Scripting, Web-WMI –IncludeManagementTools
 
-    # The Node statement specifies which targets this configuration will be applied to.
-    Node 'localhost' {
+Copy-Item "$env:systemdrive\s3-files\test-website" "$env:systemdrive\inetpub\test-website"
 
-        # The first resource block ensures that the Web-Server (IIS) feature is enabled.
-        WindowsFeature WebServer {
-            Ensure = "Present"
-            Name   = "Web-Server"
-        }
+Import-Module WebAdministration
 
-        # The second resource block ensures that the website content copied to the website root folder.
-        File WebsiteContent {
-            Ensure = 'Present'
-            SourcePath = 'c:\s3-files\test-website\index.htm'
-            DestinationPath = 'c:\inetpub\wwwroot'
-        }
-    }
-}
+New-WebAppPool -name "SandboxAppPool"  -force
+
+$appPool = Get-Item -name "SandboxAppPool" 
+$appPool.processModel.identityType = "NetworkService"
+# $appPool.enable32BitAppOnWin64 = 1
+$appPool | Set-Item
+
+$site = $site = New-WebSite -Name TestSite -Port 80 -HostHeader TestSite -PhysicalPath "$env:systemdrive\inetpub\test-website" -ApplicationPool "SandboxAppPool"
