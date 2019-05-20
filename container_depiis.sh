@@ -7,7 +7,7 @@ if [ ! -f /.dockerenv ] ; then
     exit 1
 fi
 
-aws s3 cp --recursive /sandbox/s3-files ${S3_BUCKET_URI}
+aws s3 cp --recursive /sandbox/s3-files s3://${S3_BUCKET_NAME}/${S3_BUCKET_KEY}
 
 if ! aws ec2 describe-key-pairs --key-name ws2012-sandbox ; then
     echo "Sandbox keypair does not exist, creating now."
