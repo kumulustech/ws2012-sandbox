@@ -1,8 +1,10 @@
 FROM alpine:latest
 RUN apk -v --update add \
+        curl \
         python \
         py-pip \
         groff \
+        jq \
         less \
         mailcap \
         gettext \
