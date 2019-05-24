@@ -34,9 +34,10 @@ if ! aws ec2 describe-security-groups --group-names ws2012-sandbox ; then
         --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges="[{CidrIp=0.0.0.0/0,Description='HTTP access'}]",Ipv6Ranges="[{CidrIpv6=::/0,Description='HTTP access'}]"
 fi
 
-# image-id points to WS2012 image
+WS2012_IMAGE_ID=`aws ec2 describe-images --owners amazon --filters "Name=name,Values=Windows_Server-2012-RTM-English-64Bit-Base*" --query 'sort_by(Images, &CreationDate)[-1].ImageId' --output text`
+
 CREATE_OUTPUT=`aws ec2 run-instances \
-    --image-id ami-049d3d4d8ed0f7269 \
+    --image-id $WS2012_IMAGE_ID \
     --count 1 \
     --instance-type t2.micro \
     --key-name ws2012-sandbox \
