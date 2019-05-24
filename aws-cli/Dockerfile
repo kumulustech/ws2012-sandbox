@@ -1,3 +1,4 @@
+# source: https://github.com/mesosphere/aws-cli
 FROM alpine:latest
 RUN apk -v --update add \
         curl \

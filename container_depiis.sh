@@ -6,14 +6,21 @@ if [ ! -f /.dockerenv ] ; then
     exit 1
 fi
 
-aws s3 cp --recursive /sandbox/s3-files s3://${S3_BUCKET_NAME}/${S3_BUCKET_KEY}
+if ! S3_BUCKET_REGION=`aws s3api get-bucket-location --bucket $S3_BUCKET_NAME --query "LocationConstraint" --output text` ; then
+    echo "Bucket $S3_BUCKET_NAME does not exist, attempting to create now"
+    S3_BUCKET_REGION=$AWS_DEFAULT_REGION
+    aws s3api create-bucket --bucket $S3_BUCKET_NAME --region $S3_BUCKET_REGION --create-bucket-configuration LocationConstraint=${S3_BUCKET_REGION}
+fi
+
+export S3_BUCKET_REGION
+
+aws s3 cp --recursive /sandbox/s3-files s3://${S3_BUCKET_NAME}/${S3_BUCKET_KEY} --region $S3_BUCKET_REGION
 
 if ! aws ec2 describe-key-pairs --key-name ws2012-sandbox ; then
     echo "Sandbox keypair does not exist, creating now."
     aws ec2 create-key-pair --key-name ws2012-sandbox --query 'KeyMaterial' --output text > /sandbox/ws2012-sandbox-key.pem
 fi
 
-# TODO: add firewall inbound rules
 if ! aws ec2 describe-security-groups --group-names ws2012-sandbox ; then
     echo "Sandbox security group does not exist, creating now."
     aws ec2 create-security-group --group-name ws2012-sandbox --description "Security group for Windows Server 2012 test application"
@@ -55,4 +62,4 @@ until curl -m 5 -s $PUB_IP | grep -q 'Hello' ; do
 done
 
 echo ''
-printf "Test website ready; enter %s into your browser" $PUB_IP
+printf "Test website ready; enter %s into your browser\n" $PUB_IP

@@ -1,6 +1,6 @@
 <powershell>
 Import-Module AWSPowerShell
 Set-AWSCredential -AccessKey ${AWS_ACCESS_KEY_ID} -SecretKey ${AWS_SECRET_ACCESS_KEY} -StoreAs default
-Copy-S3Object -Region ${AWS_DEFAULT_REGION} -BucketName ${S3_BUCKET_NAME} -KeyPrefix ${S3_BUCKET_KEY} -LocalFolder C:\s3-files\
+Copy-S3Object -Region ${S3_BUCKET_REGION} -BucketName ${S3_BUCKET_NAME} -KeyPrefix ${S3_BUCKET_KEY} -LocalFolder C:\s3-files\
 Invoke-Expression -Command "C:\s3-files\test-website-config.ps1"
 </powershell>
