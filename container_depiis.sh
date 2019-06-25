@@ -32,6 +32,11 @@ if ! aws ec2 describe-security-groups --group-names ws2012-sandbox ; then
     # authorize web for everyone
     aws ec2 authorize-security-group-ingress --group-name ws2012-sandbox \
         --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges="[{CidrIp=0.0.0.0/0,Description='HTTP access'}]",Ipv6Ranges="[{CidrIpv6=::/0,Description='HTTP access'}]"
+
+    # authorize describe access for everyone 
+    # TODO: restrict to servo known IPs
+    aws ec2 authorize-security-group-ingress --group-name ws2012-sandbox \
+        --ip-permissions IpProtocol=tcp,FromPort=8080,ToPort=8080,IpRanges="[{CidrIp=0.0.0.0/0,Description='HTTP describe access'}]",Ipv6Ranges="[{CidrIpv6=::/0,Description='HTTP describe access'}]"
 fi
 
 WS2012_IMAGE_ID=`aws ec2 describe-images --owners amazon --filters "Name=name,Values=Windows_Server-2012-RTM-English-64Bit-Base*" --query 'sort_by(Images, &CreationDate)[-1].ImageId' --output text`
