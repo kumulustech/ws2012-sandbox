@@ -62,6 +62,8 @@ Register-ScheduledTask -Action $action `
     -TaskName "Servo Describe" `
     -Description "Twice hourly updating of current tuning settings into describe.json of describe-website"
 
+Invoke-Expression -Command "$env:systemdrive\s3-files\describe.ps1"
+
 # DEV/DEBUG:
 # enable failed request tracing https://stackoverflow.com/questions/49547176/is-there-a-scripted-way-to-configure-failed-request-tracing-frt-and-frt-rules
 # uncomment following lines
