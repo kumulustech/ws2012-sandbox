@@ -1,0 +1,22 @@
+---
+schemaVersion: "2.2"
+description: "Servo Adjust Command"
+parameters:
+  UriEnableCache:
+    type: "String"
+  UriScavengerPeriod:
+    type: "String"
+  WebConfigCacheEnabled:
+    type: "String"
+  WebConfigEnableKernelCache:
+    type: "String"
+mainSteps:
+- action: "aws:runPowerShellScript"
+  name: "main"
+  inputs:
+    runCommand:
+    - "Import-Module WebAdministration"
+    - "Set-WebConfigurationProperty -Filter 'system.webServer/caching' -PSPath 'MACHINE/WEBROOT/APPHOST' -Name 'enabled' -Value {{ WebConfigCacheEnabled }}"
+    - "Set-WebConfigurationProperty -Filter 'system.webServer/caching' -PSPath 'MACHINE/WEBROOT/APPHOST' -Name 'enableKernelCache' -Value {{ WebConfigEnableKernelCache }}"
+    - "Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Services\\Http\\Parameters' -Name 'UriEnableCache' -Value {{ UriEnableCache }}"
+    - "Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Services\\Http\\Parameters' -Name 'UriScavengerPeriod' -Value {{ UriScavengerPeriod }}"

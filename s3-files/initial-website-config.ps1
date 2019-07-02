@@ -23,46 +23,46 @@ $testSite = $testSite = New-WebSite `
     -PhysicalPath "$env:systemdrive\inetpub\test-website" `
     -ApplicationPool "SandboxAppPool"
 
-$describeSite = $describeSite = New-WebSite `
-    -Name DescribeSite `
-    -Port 8080 `
-    -IPAddress $(Get-NetIpAddress -AddressFamily IPv4 | Select-Object -first 1 -ExpandProperty IPAddress) `
-    -PhysicalPath "$env:systemdrive\inetpub\describe-website" `
-    -ApplicationPool "SandboxAppPool"
+# $describeSite = $describeSite = New-WebSite `
+#     -Name DescribeSite `
+#     -Port 8080 `
+#     -IPAddress $(Get-NetIpAddress -AddressFamily IPv4 | Select-Object -first 1 -ExpandProperty IPAddress) `
+#     -PhysicalPath "$env:systemdrive\inetpub\describe-website" `
+#     -ApplicationPool "SandboxAppPool"
 
 # allow serving of json
-Add-WebConfigurationProperty `
-    -PSPath $describeSite.pspath  `
-    -Filter system.webServer/staticContent `
-    -Name "." `
-    -Value @{
-        fileExtension='.json';
-        mimeType='application/json'
-    }
+# Add-WebConfigurationProperty `
+#     -PSPath $describeSite.pspath  `
+#     -Filter system.webServer/staticContent `
+#     -Name "." `
+#     -Value @{
+#         fileExtension='.json';
+#         mimeType='application/json'
+#     }
     
 # Create inbound firewall rule for servo describe access
-New-NetFirewallRule `
-    -DisplayName "HTTP describe access" `
-    -Direction Inbound `
-    -Action Allow `
-    -Protocol TCP `
-    -LocalPort 8080
+# New-NetFirewallRule `
+#     -DisplayName "HTTP describe access" `
+#     -Direction Inbound `
+#     -Action Allow `
+#     -Protocol TCP `
+#     -LocalPort 8080
 
 # Schedule describe task https://devblogs.microsoft.com/scripting/use-powershell-to-create-scheduled-tasks/
-$action = New-ScheduledTaskAction -Execute 'Powershell.exe' `
-    -Argument "-WindowStyle Hidden -file $env:systemdrive\s3-files\describe.ps1"
+# $action = New-ScheduledTaskAction -Execute 'Powershell.exe' `
+#     -Argument "-WindowStyle Hidden -file $env:systemdrive\s3-files\describe.ps1"
 
-$trigger =  New-ScheduledTaskTrigger -Once `
-    -At ((Get-Date).AddMinutes(1)) `
-    -RepetitionInterval (New-TimeSpan -Minutes 30) `
-    -RepetitionDuration (New-TimeSpan -Days 30)
+# $trigger =  New-ScheduledTaskTrigger -Once `
+#     -At ((Get-Date).AddMinutes(1)) `
+#     -RepetitionInterval (New-TimeSpan -Minutes 30) `
+#     -RepetitionDuration (New-TimeSpan -Days 30)
 
-Register-ScheduledTask -Action $action `
-    -Trigger $trigger `
-    -TaskName "Servo Describe" `
-    -Description "Twice hourly updating of current tuning settings into describe.json of describe-website"
+# Register-ScheduledTask -Action $action `
+#     -Trigger $trigger `
+#     -TaskName "Servo Describe" `
+#     -Description "Twice hourly updating of current tuning settings into describe.json of describe-website"
 
-Invoke-Expression -Command "$env:systemdrive\s3-files\describe.ps1"
+# Invoke-Expression -Command "$env:systemdrive\s3-files\describe.ps1"
 
 # DEV/DEBUG:
 # enable failed request tracing https://stackoverflow.com/questions/49547176/is-there-a-scripted-way-to-configure-failed-request-tracing-frt-and-frt-rules
