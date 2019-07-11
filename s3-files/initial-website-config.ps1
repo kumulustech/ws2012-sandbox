@@ -4,10 +4,16 @@ Import-Module ServerManager
 
 Install-WindowsFeature Web-Server, Web-WebServer, Web-Common-Http, Web-Default-Doc, Web-Dir-Browsing, Web-Http-Errors, Web-Static-Content, Web-Health, Web-Http-Logging, Web-Http-Tracing, Web-Performance, Web-Stat-Compression, Web-Security, Web-Filtering, Web-App-Dev, Web-Net-Ext, Web-Net-Ext45, Web-Asp, Web-Asp-Net, Web-Asp-Net45, Web-ISAPI-Ext, Web-ISAPI-Filter, Web-Mgmt-Tools, Web-Mgmt-Console, Web-Mgmt-Compat, Web-Metabase, Web-Lgcy-Mgmt-Console, Web-Lgcy-Scripting, Web-WMI -IncludeManagementTools
 
+Import-Module WebAdministration
+
+$appPool = Get-Item IIS:\AppPools\SandboxAppPool
+if($appPool -ne $null ) {
+    echo 'Test site in place, skipping initial config'
+    exit
+}
+
 Copy-Item "$env:systemdrive\s3-files\test-website" "$env:systemdrive\inetpub\test-website" -Recurse
 New-Item -ItemType directory -Path "$env:systemdrive\inetpub\describe-website"
-
-Import-Module WebAdministration
 
 New-WebAppPool -name "SandboxAppPool"  -force
 
@@ -49,20 +55,20 @@ New-NetFirewallRule `
     -LocalPort 8080
 
 # Schedule describe task https://devblogs.microsoft.com/scripting/use-powershell-to-create-scheduled-tasks/
-$action = New-ScheduledTaskAction -Execute 'Powershell.exe' `
-    -Argument "-WindowStyle Hidden -file $env:systemdrive\s3-files\describe.ps1"
+# $action = New-ScheduledTaskAction -Execute 'Powershell.exe' `
+#     -Argument "-WindowStyle Hidden -file $env:systemdrive\s3-files\describe.ps1"
 
-$trigger =  New-ScheduledTaskTrigger -Once `
-    -At ((Get-Date).AddMinutes(1)) `
-    -RepetitionInterval (New-TimeSpan -Minutes 30) `
-    -RepetitionDuration (New-TimeSpan -Days 30)
+# $trigger =  New-ScheduledTaskTrigger -Once `
+#     -At ((Get-Date).AddMinutes(1)) `
+#     -RepetitionInterval (New-TimeSpan -Minutes 30) `
+#     -RepetitionDuration (New-TimeSpan -Days 30)
 
-Register-ScheduledTask -Action $action `
-    -Trigger $trigger `
-    -TaskName "Servo Describe" `
-    -Description "Twice hourly updating of current tuning settings into describe.json of describe-website"
+# Register-ScheduledTask -Action $action `
+#     -Trigger $trigger `
+#     -TaskName "Servo Describe" `
+#     -Description "Twice hourly updating of current tuning settings into describe.json of describe-website"
 
-Invoke-Expression -Command "$env:systemdrive\s3-files\describe.ps1"
+# Invoke-Expression -Command "$env:systemdrive\s3-files\describe.ps1"
 
 # DEV/DEBUG:
 # enable failed request tracing https://stackoverflow.com/questions/49547176/is-there-a-scripted-way-to-configure-failed-request-tracing-frt-and-frt-rules
