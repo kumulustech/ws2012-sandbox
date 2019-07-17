@@ -4,12 +4,16 @@ description: "Servo Adjust Command"
 parameters:
   UriEnableCache:
     type: "String"
+    default: "{{ssm:/servo/ec2win/UriEnableCache}}"
   UriScavengerPeriod:
     type: "String"
+    default: "{{ssm:/servo/ec2win/UriScavengerPeriod}}"
   WebConfigCacheEnabled:
     type: "String"
+    default: "{{ssm:/servo/ec2win/WebConfigCacheEnabled}}"
   WebConfigEnableKernelCache:
     type: "String"
+    default: "{{ssm:/servo/ec2win/WebConfigEnableKernelCache}}"
 mainSteps:
 - action: "aws:runPowerShellScript"
   name: "main"
