@@ -2,7 +2,7 @@ Import-Module WebAdministration
 @{
     "HKLM:\System\CurrentControlSet\Services\Http\Parameters" = Get-ItemProperty -Path "HKLM:\System\CurrentControlSet\Services\Http\Parameters"
     "WebConfig" = @{
-        'MACHINE/WEBROOT/APPHOST/TestSite' = @{
+        'MACHINE/WEBROOT/APPHOST' = @{
             "system.webServer/caching" = Get-WebConfiguration -pspath 'MACHINE/WEBROOT/APPHOST/TestSite' -filter "system.webServer/caching"
         }
     }
